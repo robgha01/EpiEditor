@@ -35,7 +35,7 @@ namespace Alloy.Models.Properties
             }
             set
             {
-                if (value is RelatedLinksWithMedia)
+                if (value is IEnumerable<RelatedLinksWithMedia>)
                 {
                     //serialize content if content is RelatedLinksWithMedia 
                     var serializer = new JavaScriptSerializer();

@@ -353,6 +353,7 @@ define([
     "dojo/Deferred",
     "dojo/store/Observable",
     "dojo/store/Memory",
+    "dojo/json",
 
     //dgrid
     "dgrid/OnDemandGrid",
@@ -408,9 +409,10 @@ define([
         Deferred,
         Observable,
         Memory,
+        JSON,
 
         //dgrid
-        Grid,
+        OnDemandGrid,
 
         //ditij
         _CssStateMixin,
@@ -441,8 +443,7 @@ define([
 
         return declare("alloy.editors.RelatedLinksWithMedia.LinkItemCollectionEditor",
             [
-                _Widget, _TemplatedMixin, _WidgetsInTemplateMixin, _CssStateMixin, _TextWithActionLinksMixin,
-                _ModelBindingMixin
+                _Widget, _TemplatedMixin, _WidgetsInTemplateMixin, _CssStateMixin
             ],
             {
                 // summary:
@@ -451,12 +452,27 @@ define([
                 //    internal
                 newItemDialog: null,
 
+                value: null,
+
+                widgetsInTemplate: true,
+
                 resource: res,
 
                 templateString: template,
 
                 // LinkHelper to retrieve the link info
                 linkHelper: PermanentLinkHelper,
+
+                startup: function () {
+                    this.inherited(arguments);
+
+                    //if (this._started) {
+                    //    return;
+                    //}
+
+                    //!this.value && this.set("value", null);
+                    //this._size();
+                },
 
                 postMixInProperties: function() {
                     this.inherited(arguments);
@@ -469,8 +485,6 @@ define([
 
                 postCreate: function() {
                     this.inherited(arguments);
-
-
                 },
 
                 buildRendering: function() {
@@ -516,7 +530,7 @@ define([
                         }
                     };
 
-                    this.own(this.content = new declare([Grid])(gridSettings, this.itemsContainer));
+                    this.own(this.content = new declare([OnDemandGrid])(gridSettings, this.itemsContainer));
                     this.content.startup();
 
                     //this.setupCommands();
@@ -524,7 +538,6 @@ define([
                 },
 
                 _onCreateNewItemClick: function() {
-                    // ToDo: Create a dialog to add a new item.
                     this.own(this.editorItem = new declare([EditorItem])({
                         startpageContentLink: this.startpageContentLink,
                         allowedTypes: this.allowedTypes,
@@ -537,71 +550,22 @@ define([
 
                     // Show the dialog
                     this.editorItem._onButtonClick();
-
-                    //if (this.newItemOnChangeHandle == null) {
-                    //    this.newItemOnChangeHandle = this.connect(this.editorItem,
-                    //        "onChange",
-                    //        function(value) {
-                    //            var currentValue = this.get("value");
-                    //            currentValue.push(value);
-
-                    //            //this._setValueAttr([]);
-                    //            this._setValueAttr(currentValue);
-
-                    //            console.log(this.get("value"));
-                    //        });
-                    //}
-
                     this.connect(this.editorItem,
                         "onChange",
                         function(value) {
-                            //var currentValue = this.get("value");
-                            //currentValue.push(value);
+                            //this._setValueAndFireOnChange(value);
 
-                            // update the grid
-                            //this.content.insertRow(value);
                             this.store.put(value);
+                            var tmpValue = [];
 
-                            //this._setValueAttr([]);
-                            this._setValueAttr(value);
+                            for (var item of this.store.data) {
+                                tmpValue.push({ caption: item.caption, image: item.image, page: item.page, href: item.href });
+                            }
+
+                            this.onFocus();
+                            this.set("value", tmpValue);
+                            this.onChange(tmpValue);
                         });
-                },
-
-                startup: function() {
-                    // summary:
-                    //      Overridden to reset input field.
-
-                    this.inherited(arguments);
-
-                    //if (this._started) {
-                    //    return;
-                    //}
-
-                    !this.value && this.set("value", null);
-                    this.items = this.get("value");
-
-                    //this.store = new Observable(new Memory({ data: this.items }));
-                    //var results = this.store.query();
-
-                    //results.observe(function (object, removedFrom, insertedInto) {
-                    //    if (removedFrom > -1) { // existing object removed
-                    //        console.log(removedFrom);
-                    //    }
-                    //    if (insertedInto > -1) { // new or updated object inserted
-                    //        console.log(insertedInto, object);
-                    //    }
-                    //});
-
-                    //this.content.renderArray(results);
-
-
-                    //if (this.items != null) {
-                    //    this.content.renderArray(this.items);
-                    //}
-
-
-
-                    this._size();
                 },
 
                 _size: function() {
@@ -619,64 +583,79 @@ define([
                     domStyle.set(this.actionsContainer, "display", this.readOnly || !this.actionsVisible ? "none" : "");
                 },
 
-                //_getValueAttr: function() {
+                _setValueAttr: function (value) {
+                    // summary:
+                    //    Sets the value of the widget to "value" and updates the value displayed in the textbox.
+                    // tags:
+                    //    private
+
+                    this._set('value', value);
+                }
+
+                //_setValueAttr: function(/*Object*/val) {
                 //    // summary:
-                //    //      The get value method
+                //    //      The set value method
                 //    // tags:
                 //    //      public override
 
-                //    return this.get("value");
+                //    // Reset value to an empty array
+                //    if (!val || !(val instanceof Array)) {
+                //        //this._set("value", []);
+                //        //this._setValueAndFireOnChange([]);
+                //    } else {
+                //        this._setValueAndFireOnChange(val);
+                //    }
                 //},
 
-                _setValueAttr: function(/*Object*/val) {
-                    // summary:
-                    //      The set value method
-                    // tags:
-                    //      public override
+                // Event that tells EPiServer when the widget's value has changed.
+                //onChange: function (value) { },
 
-                    // Reset value to an empty array
-                    if (!val || !(val instanceof Array)) {
-                        //this._set("value", []);
-                        this._setValueAndFireOnChange([]);
-                    } else {
-                        this._setValueAndFireOnChange(val);
-                    }
-                },
+                //_onChange: function (value) {
+                //    console.log("Notifying EPiServer with onChange: " + JSON.stringify(value));
+                //    this.onChange(value);
+                //    console.log("Done notitying EPiServer");
+                //},
 
-                _setValueAndFireOnChange: function (/* Object */ value) {
-                    //summary:
-                    //    Sets the value internally and fires onChange if the value differs than the current value
-                    //
-                    // value: [Object]
-                    //    A related links with media model as value
-                    //    Value to be set.
-                    //
-                    // tags:
-                    //  private
+                //_setValueAndFireOnChange: function (/* Object */ value) {
+                //    //summary:
+                //    //    Sets the value internally and fires onChange if the value differs than the current value
+                //    //
+                //    // value: [Object]
+                //    //    A related links with media model as value
+                //    //    Value to be set.
+                //    //
+                //    // tags:
+                //    //  private
 
-                    var currentLink = this.get("value");
-                    this._set("value", value);
+                //    //var currentLink = this.get("value");
+                //    //this._set("value", value);
 
-                    // detect whether to invoke onChange or not
-                    var triggerOnChange = true;
+                //    var currentLink = this.get("value");
 
-                    if (!currentLink && !value) {
-                        triggerOnChange = false;
-                    } else if (value && value === currentLink) {
-                        triggerOnChange = false;
-                    }
+                //    this.store.put(value);
+                //    var tmpValue = [];
 
-                    if (triggerOnChange) {
-                        this.onChange(value);
-                    }
+                //    for (var item of this.store.data) {
+                //        tmpValue.push({ caption: item.caption, image: item.image, page: item.page, href: item.href });
+                //    }
 
-                    this.items = value;
-                    //this.content.renderRow(value);
-                    //this.content.renderArray(this.items);
-                    //this.content.newRow(value);
+                //    this._set("value", tmpValue);
 
-                    // ToDo: How to add new items ...
+                //    // detect whether to invoke onChange or not
+                //    var triggerOnChange = true;
 
-                }
+                //    if (!currentLink && !value) {
+                //        triggerOnChange = false;
+                //    } else if (value && value === currentLink) {
+                //        triggerOnChange = false;
+                //    }
+
+                //    if (triggerOnChange) {
+                //        this.onChange(value);
+                //    }
+                //},
+                //isValid: function () {
+                //    return true;
+                //}
             });
     });
