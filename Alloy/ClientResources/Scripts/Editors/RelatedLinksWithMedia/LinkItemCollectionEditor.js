@@ -1,339 +1,4 @@
-﻿//define([
-//    // Dojo
-//    "dojo/_base/array",                                                         // got some array extension methods
-//    "dojo/_base/declare",
-//    "dojo/_base/lang",
-//    "dojo/_base/event",                                                         // used to stop event
-//    "dojo/aspect",                                                              // used to listen event from model
-//    "dojo/dom-class",                                                           // used to add/remove dom class
-//    "dojo/dom-construct",                                                       // used to create dom elem
-//    "dojo/dom-style",                                                           // used to show or not the action's container
-//    "dojo/dom-geometry",                                                        // used to get dom position
-//    "dojo/keys",                                                                // used to detect key to open context menu
-//    "dojo/mouse",                                                               // used to detect mouse event
-//    "dojo/on",                                                                  // used to listen event
-//    "dojo/query",                                                               // used to select dome
-//    "dojo/topic",                                                               // used to publish global event
-//    "dojo/when",                                                                // used to work with potential assynchronous calls
-
-//    // Dijit
-//    "dijit/_TemplatedMixin",                                                    // mixin into me
-//    "dijit/_WidgetsInTemplateMixin",                                            // mixin into me
-//    "dijit/layout/_LayoutWidget",                                               // inherited directly
-
-//    // EPi Framework
-//    "epi/shell/dgrid/Formatter",                                                // mixin into grid class
-//    "epi/shell/dnd/Target",                                                     // used to create an drop zone in actionContainer area
-//    "epi/shell/widget/_ValueRequiredMixin",                                     // mixin into me
-//    "epi/shell/widget/ContextMenu",                                             // used to create context menu
-//    "epi/shell/TypeDescriptorManager",
-
-//    // EPi CMS
-//    "dgrid/Keyboard",                                                           // mixin into grid class
-//    "dgrid/OnDemandList",                                                       // mixin into grid class
-//    "dgrid/Selection",                                                          // mixin into grid class
-//    "epi-cms/dgrid/formatters",                                                 // used to format grid's item display name
-//    "epi-cms/dgrid/DnD",                                                        // mixin into grid class
-//    "epi-cms/extension/events",                                                 // used to get default events
-//    "epi-cms/contentediting/command/NewItem",                                   // used to create new item
-//    "epi-cms/contentediting/viewmodel/ItemCollectionViewModel",                 // editor view model
-//    "epi-cms/contentediting/command/ItemCollectionCommands",                    // context menu
-//    "epi-cms/widget/_HasChildDialogMixin",                                      // mixin into me
-//    "epi-cms/contentediting/editors/_TextWithActionLinksMixin",
-
-//    // Resources
-//    "dojo/text!./templates/LinkItemCollectionEditor.html",                          // editor template
-//    "epi/i18n!epi/cms/nls/episerver.cms.contentediting.editors.itemcollection",  // language resources
-
-//    "alloy.editors.RelatedLinksWithMedia.Editor"
-
-//], function (
-//    // Dojo
-//    array,
-//    declare,
-//    lang,
-//    event,
-//    aspect,
-//    domClass,
-//    domConstruct,
-//    domStyle,
-//    domGeometry,
-//    keys,
-//    mouse,
-//    on,
-//    query,
-//    topic,
-//    when,
-
-//    // Dijit
-//    _TemplatedMixin,
-//    _WidgetsInTemplateMixin,
-//    _LayoutWidget,
-
-//    // EPi Framework
-//    Formatter,
-//    Target,
-//    _ValueRequiredMixin,
-//    ContextMenu,
-//    TypeDescriptorManager,
-
-//    // EPi CMS
-//    Keyboard,
-//    OnDemandList,
-//    Selection,
-//    formatters,
-//    DnD,
-//    events,
-//    NewItemCommand,
-//    ItemCollectionViewModel,
-//    ItemCollectionCommands,
-//    _HasChildDialogMixin,
-//    _TextWithActionLinksMixin,
-
-//    // Resources
-//    template,
-//    resources,
-
-//    EditorItem
-
-//) {
-
-//    return declare("alloy.editors.RelatedLinksWithMedia.LinkItemCollectionEditor", [
-//        _LayoutWidget,                                                          // for base functionalities
-//        _TemplatedMixin, _WidgetsInTemplateMixin,                               // for base functionalities
-//        _ValueRequiredMixin,                                                    // for styling
-//        _HasChildDialogMixin,                                                   // for open dialog to create/edit an item
-//        _TextWithActionLinksMixin
-//    ], {
-//        // res: [protected] Json object
-//        //      Language resource
-//        res: resources,
-
-//        // actionsResource: [Object]
-//        //      The language resource for actions link
-//        actionsResource: resources,
-
-//        // templateString: [protected] String
-//        //      UI template for the editor
-//        templateString: template,
-
-//        // value: [protected] String
-//        //      Value of the property (link collection)
-//        value: null,
-
-//        // _gridClass: [private] Grid class
-//        //      The grid class to create new grid instance.
-//        _gridClass: declare([OnDemandList, Formatter, Selection, DnD, Keyboard]),
-
-//        // _mouseOverClass: [private] CSS class
-//        //      Used to show context menu when mouse hover a row
-//        _mouseOverClass: "epi-dgrid-mouseover",
-
-//        onChange: function (value) {
-//            // summary:
-//            //      Event raised when model value change or item's sort order changed
-//            // value:
-//            //      The link collection value
-//            // tags:
-//            //      public callback
-//        },
-
-//        postMixInProperties: function () {
-//            this.inherited(arguments);
-//        },
-
-//        postCreate: function () {
-//            this.inherited(arguments);
-
-//            var dummyData = [];
-//            var item1 = new EditorItem();
-
-
-
-//            dummyData.push(item1);
-
-
-//            this._set("value", []);
-
-//            this.setupList();
-//        },
-
-//        startup: function () {
-//            this.inherited(arguments);
-//        },
-
-//        setupList: function () {
-//            // summary:
-//            //      Initialization a list.
-//            // tags:
-//            //      protected
-
-//            var menu = { hasMenu: !!this.contextMenu, settings: { title: this.res ? this.res.menutooltip : "" } },
-
-//                linkAssembler = function (data, object, row) {
-//                    return "<div class='epi-rowIcon'><span class='dijitInline dijitIcon epi-iconLink epi-objectIcon'></span></div>" + data;
-//                },
-//                // Init grid
-//                settings = {
-//                    selectionMode: "single",
-//                    selectionEvents: "click,dgrid-cellfocusin",
-//                    formatters: [formatters.contentItemFactory("text", "title", "typeIdentifier", menu), linkAssembler],
-//                    dndParams: {
-//                        copyOnly: true,
-//                        accept: this.get("allowedDndTypes"),
-//                        creator: lang.hitch(this, this._dndNodeCreator),
-//                        isSource: !this.readOnly
-//                    },
-//                    dndSourceTypes: this.customTypeIdentifier ? [this.customTypeIdentifier] : [],
-//                    consumer: this
-//                },
-
-//                getDndType = function (object) {
-//                    var types = TypeDescriptorManager.getAndConcatenateValues(this.dndSourceTypes, "dndTypes");
-
-//                    if (types.length === 0) {
-//                        types = this.dndSourceTypes;
-//                    }
-//                    return types;
-//                };
-
-//            this.own(this.grid = new this._gridClass(settings, this.itemsContainer));
-//            this.grid.set("showHeader", false);
-//            this.grid.renderArray(this.model.get("data"));
-//            this.grid.startup();
-//        },
-
-//        select: function (item) {
-//            // summary:
-//            //      Set selected item on dgrid
-//            // item: Object
-//            //      The selected object
-//            // tags:
-//            //      protected
-
-//            this.grid.clearSelection();
-//            if (item) {
-//                this.grid.select(this.model.getItemIndex(item));
-//            }
-//        },
-
-//        isValid: function () {
-//            // summary:
-//            //    Check if widget's value is valid.
-//            // isFocused:
-//            //    Indicate that the widget is being focused.
-//            // tags:
-//            //    protected
-
-//            return (!this.required || (this.model && this.model.get("value").length > 0));
-//        },
-
-//        _getValueAttr: function () {
-//            // summary:
-//            //      The get value method
-//            // tags:
-//            //      public override
-
-//            return this.model.get("value");
-//        },
-
-//        _setValueAttr: function (/*Object*/val) {
-//            // summary:
-//            //      The set value method
-//            // tags:
-//            //      public override
-
-//            this._set("value", val);
-//            // Reset value to an empty array
-//            if (!val || !(val instanceof Array)) {
-//                this._set("value", []);
-//            }
-
-//            if (this._started) {
-//                this.model ? this.model.set("data", this.value) : (this.model = new ItemCollectionViewModel(this.value, { readOnly: this.readOnly }));
-//                this._renderUI();
-//            }
-//        },
-
-//        _setReadOnlyAttr: function (/*Boolean*/readOnly) {
-//            // summary:
-//            //      Overwrite readonly property
-//            // tags:
-//            //      Protected
-
-//            this._set("readOnly", readOnly);
-
-//            // Hide actions container area if is readOnly
-//            this._displayActionsContainer();
-
-//            if (this.model) {
-//                this.model.set("readOnly", readOnly);
-//            }
-//        },
-
-//        _dndNodeCreator: function (/*Object*/item, /*Object*/hint) {
-//            // summary:
-//            //      Custom DnD avatar creator method
-//            // tags:
-//            //      Protected
-
-//            var dndTypes = this.allowedDndTypes,
-//                node = domConstruct.create("div").appendChild(document.createTextNode(item.text));
-
-//            if (item.typeIdentifier) {
-//                dndTypes = TypeDescriptorManager.getAndConcatenateValues(item.typeIdentifier, "dndTypes");
-//            }
-
-//            return {
-//                node: node,
-//                type: dndTypes,
-//                data: item
-//            };
-//        },
-
-//        _aroundInsertRow: function (/*Object*/original) {
-//            // summary:
-//            //      Called 'around' the insertRow method to fix the grids less than perfect selection.
-//            // tags:
-//            //      private
-
-//            return lang.hitch(this, function (object, parent, beforeNode, i, options) {
-
-//                // Call original method
-//                var row = original.apply(this.grid, arguments);
-
-//                var currentItem = this.model.get("selectedItem");
-//                if (currentItem && currentItem.id === object.id) {
-//                    this.select(currentItem);
-//                }
-
-//                return row;
-//            });
-//        },
-
-//        _renderUI: function () {
-//            // summary:
-//            //      The common method to update grid ui and set selected item.
-//            // tags:
-//            //      private
-
-//            this.grid.refresh();
-//            this.grid.renderArray(this.model.get("data"));
-//        },
-
-//        _displayActionsContainer: function () {
-//            // summary:
-//            //      Show/not actions container area
-//            // tags:
-//            //      private
-
-//            // Hide actions when readonly or set not visible
-//            domStyle.set(this.actionsContainer, "display", this.readOnly || !this.actionsVisible ? "none" : "");
-//        }
-//    });
-//});
-
-define([
+﻿define([
     // Dojo
     "dojo/_base/array",                                                         // got some array extension methods
     "dojo/_base/declare",
@@ -355,8 +20,13 @@ define([
     "dojo/store/Memory",
     "dojo/json",
 
-    //dgrid
+    // dgrid
+    "dgrid/Keyboard",
     "dgrid/OnDemandGrid",
+    "dgrid/Selection",
+    "dgrid/extensions/ColumnResizer",
+    "dgrid/extensions/ColumnReorder",
+    "put-selector/put",
 
     // dijit,
     "dijit/_CssStateMixin",
@@ -364,12 +34,16 @@ define([
     "dijit/_Widget",
     "dijit/_WidgetsInTemplateMixin",
 
+    // epi shell
+    "epi/shell/dgrid/Formatter",
+
     // EPi Framework
     "epi/shell/widget/_ModelBindingMixin",
     "epi/shell/widget/dialog/Dialog",
     "epi/Url",
     "epi-cms/dgrid/listItemFormatters",
     "epi-cms/dgrid/formatters",
+    "epi-cms/dgrid/WithContextMenu",
     "epi/shell/dnd/Target",
     "epi/shell/widget/ContextMenu",
 
@@ -382,6 +56,9 @@ define([
     "epi-cms/core/PermanentLinkHelper",
     "epi/i18n!epi/cms/nls/episerver.cms.widget.editlink",
     "dojo/text!./templates/LinkItemCollectionEditor.html",
+    "epi-cms/contentediting/editors/DefaultGridAssembler",
+    "epi/shell/command/DelegateCommand",
+    "epi/i18n!epi/nls/episerver.shared",
 
     // widgets
     "alloy/editors/RelatedLinksWithMedia/Editor",
@@ -409,16 +86,22 @@ define([
         Deferred,
         Observable,
         Memory,
-        JSON,
+        json,
 
         //dgrid
+        Keyboard,
         OnDemandGrid,
+        Selection,
+        ColumnResizer,
+        ColumnReorder,
+        put,
 
         //ditij
         _CssStateMixin,
         _TemplatedMixin,
         _Widget,
         _WidgetsInTemplateMixin,
+        Formatter,
 
         // EPi Framework
         _ModelBindingMixin,
@@ -426,6 +109,7 @@ define([
         Url,
         listItemFormatters,
         formatters,
+        WithContextMenu,
         Target,
         ContextMenu,
 
@@ -438,8 +122,19 @@ define([
         PermanentLinkHelper,
         res,
         template,
+        DefaultGridAssembler,
+        DelegateCommand,
+        sharedResources,
         EditorItem
     ) {
+
+        var commandMask = {
+            // summary:
+            //      Command mask enum.
+            // tags:
+            //      internal
+            none: 0, add: 1, edit: 2, remove: 4, moveUp: 8, moveDown: 16
+        };
 
         return declare("alloy.editors.RelatedLinksWithMedia.LinkItemCollectionEditor",
             [
@@ -464,6 +159,8 @@ define([
 
                 // LinkHelper to retrieve the link info
                 linkHelper: PermanentLinkHelper,
+
+                _currentProviderHandler: null,
 
                 startup: function () {
                     this.inherited(arguments);
@@ -496,44 +193,112 @@ define([
 
                     var gridSettings = {
                         store: this.store,
-                        showHeader: false,
-                        "class": "",
-                        columns: {
-                            caption: {
-                                sortable: false,
-                                label: "Caption",
-                                className: "epi-grid--30 epi-cursor--default",
-                                renderCell: function(object, value, node, options) {
-                                    node.textContent = object.caption;
-                                }
-                            },
-                            image: {
-                                sortable: false,
-                                label: "Image",
-                                className: "epi-grid--40 epi-cursor--default",
-                                renderCell: function(object, value, node, options) {
-                                    var title = object.name + ", ID: " + object.contentLink;
-                                    node.innerHTML =
-                                        listItemFormatters.statusFormatter(
-                                            formatters.contentItem(object.typeIdentifier, "", value, title),
-                                            object,
-                                            node,
-                                            options);
-                                }
-                            },
-                            url: {
-                                sortable: false,
-                                className: "epi-grid--30 epi-cursor--default",
-                                label: "Url",
-                                renderCell: function(object, value, node, options) {
-                                    node.textContent = object.page ? object.page.id : object.href;
-                                }
+                        showHeader: false
+                    };
+
+                    var columns = {
+                        caption: {
+                            sortable: false,
+                            label: "Caption",
+                            className: "epi-grid--30 epi-cursor--default",
+                            renderCell: function(object, value, node, options) {
+                                node.textContent = object.caption;
+                            }
+                        },
+                        image: {
+                            sortable: false,
+                            label: "Image",
+                            className: "epi-grid--40 epi-cursor--default",
+                            renderCell: function(object, value, node, options) {
+                                var title = object.name + ", ID: " + object.contentLink;
+                                node.innerHTML =
+                                    listItemFormatters.statusFormatter(
+                                        formatters.contentItem(object.typeIdentifier, "", value, title),
+                                        object,
+                                        node,
+                                        options);
+                            }
+                        },
+                        url: {
+                            sortable: false,
+                            className: "epi-grid--30 epi-cursor--default",
+                            label: "Url",
+                            renderCell: function(object, value, node, options) {
+                                node.textContent = object.page ? object.page.id : object.href;
                             }
                         }
                     };
 
-                    this.own(this.content = new declare([OnDemandGrid])(gridSettings, this.itemsContainer));
-                    this.content.startup();
+                    var commands = [
+                        new DelegateCommand({
+                            name: "add",
+                            tooltip: "SomeTooltipText",
+                            iconClass: "epi-iconPlus",
+                            canExecute: true,
+                            isAvailable: true, //this._commandIsAvailable(commandMask.add, availableCommands),
+                            delegate: lang.hitch(this, this.addItemDelegate)
+                        })
+                    ];
+
+                    // Create grid assembler
+                    var gridAssembler = new DefaultGridAssembler({
+                        gridType: declare([OnDemandGrid, Formatter, Selection, Keyboard, ColumnResizer, ColumnReorder, WithContextMenu]),
+                        gridSettings: gridSettings,
+                        columnDefinitions: columns,
+                        listCommands: commands, //this.readOnly ? [] : this.model.getListCommands(),
+                        itemCommandsFactory: lang.hitch(this, function (item, category) {
+                            return this.readOnly ? [] : this.getItemCommands(item, commands, category);
+                        })
+                    });
+
+                    // Build the grid.
+                    this.own(this.grid = gridAssembler.build(this.gridNode, this.commandTargetNode));
+
+                    //style Grid
+                    domClass.add(this.gridNode, "epi-plain-grid-modal epi-plain-grid--margin-bottom epi-plain-grid--cell-borders");
+
+                    this.own(this.grid.on(".dgrid-row:click", lang.hitch(this, this.onGridRowClick)));
+                    this.own(this.grid.on(".dgrid-row:dblclick", lang.hitch(this, this.onGridRowDblClick)));
+
+                    //var gridSettings = {
+                    //    store: this.store,
+                    //    showHeader: false,
+                    //    "class": "epi-plain-grid epi-grid-height--auto",
+                    //    columns: {
+                    //        caption: {
+                    //            sortable: false,
+                    //            label: "Caption",
+                    //            className: "epi-grid--30 epi-cursor--default",
+                    //            renderCell: function(object, value, node, options) {
+                    //                node.textContent = object.caption;
+                    //            }
+                    //        },
+                    //        image: {
+                    //            sortable: false,
+                    //            label: "Image",
+                    //            className: "epi-grid--40 epi-cursor--default",
+                    //            renderCell: function(object, value, node, options) {
+                    //                var title = object.name + ", ID: " + object.contentLink;
+                    //                node.innerHTML =
+                    //                    listItemFormatters.statusFormatter(
+                    //                        formatters.contentItem(object.typeIdentifier, "", value, title),
+                    //                        object,
+                    //                        node,
+                    //                        options);
+                    //            }
+                    //        },
+                    //        url: {
+                    //            sortable: false,
+                    //            className: "epi-grid--30 epi-cursor--default",
+                    //            label: "Url",
+                    //            renderCell: function(object, value, node, options) {
+                    //                node.textContent = object.page ? object.page.id : object.href;
+                    //            }
+                    //        }
+                    //    }
+                    //};
+                    //this.own(this.grid = new declare([OnDemandGrid])(gridSettings, this.itemsContainer));
+                    //this.grid.startup();
 
                     //this.setupCommands();
                     //this.setupActionContainer();
@@ -570,18 +335,18 @@ define([
 
                 _size: function() {
                     this.inherited(arguments);
-                    this.content.resize();
+                    this.grid.resize();
                 },
 
-                _displayActionsContainer: function() {
-                    // summary:
-                    //      Show/not actions container area
-                    // tags:
-                    //      private
+                //_displayActionsContainer: function() {
+                //    // summary:
+                //    //      Show/not actions container area
+                //    // tags:
+                //    //      private
 
-                    // Hide actions when readonly or set not visible
-                    domStyle.set(this.actionsContainer, "display", this.readOnly || !this.actionsVisible ? "none" : "");
-                },
+                //    // Hide actions when readonly or set not visible
+                //    domStyle.set(this.actionsContainer, "display", this.readOnly || !this.actionsVisible ? "none" : "");
+                //},
 
                 _setValueAttr: function (value) {
                     // summary:
@@ -591,7 +356,180 @@ define([
 
                     this._set("value", value);
                     this.store.setData(value);
-                    this.content.refresh();
+                    this.grid.refresh();
+                },
+
+                //----------------------------------------------------------------------------------
+                // Command delagate methods
+                //----------------------------------------------------------------------------------
+                addItemDelegate: function () {
+                    // summary:
+                    //      execute delegate for add command.
+                    // tags:
+                    //      protected
+
+                    //this.emit("toggleItemEditor", null);
+                },
+
+                editItemDelegate: function (cmd) {
+                    // summary:
+                    //      execute delegate for edit command.
+                    // tags:
+                    //      protected
+
+                    //if (this._commandIsAvailable(commandMask.edit, this.availableCommands)) {
+
+                    //    var item = cmd.model;
+                    //    var index = this._itemModels.indexOf(item);
+
+                    //    this.emit("toggleItemEditor", item, index);
+                    //}
+                },
+
+                removeItemDelegate: function (cmd) {
+                    // summary:
+                    //      execute delegate for remove command.
+                    // tags:
+                    //      protected
+
+                    //this.removeItem(cmd.model);
+                },
+
+                moveItemUpDelegate: function (cmd) {
+                    // summary:
+                    //      execute delegate for move up command.
+                    // tags:
+                    //      protected
+
+                    //var item = cmd.model;
+                    //var index = this._itemModels.indexOf(item);
+                    //var refIndex = index - 1;
+
+                    //if (refIndex >= 0) {
+                    //    this.moveItem(item, this._itemModels[refIndex], true);
+                    //}
+                },
+
+                moveItemDownDelegate: function (cmd) {
+                    // summary:
+                    //      execute delegate for move down command.
+                    // tags:
+                    //      protected
+
+                    //var item = cmd.model;
+                    //var index = this._itemModels.indexOf(item);
+                    //var refIndex = index + 1;
+
+                    //if (refIndex < this._itemModels.length) {
+                    //    this.moveItem(item, this._itemModels[refIndex], false);
+                    //}
+                },
+
+                getItemCommands: function (item, availableCommands, category) {
+                    // summary:
+                    //      Return item level commands.
+                    // item:
+                    //      The item
+                    // availableCommands:
+                    //      The available commands bitmask. This value is Not needed to be passed since it's set up when the model is created.
+                    // category:
+                    //      The category
+                    // tags:
+                    //      public
+
+                    return [
+                        new DelegateCommand({
+                            name: "edit",
+                            category: category,
+                            label: sharedResources.action.edit,
+                            iconClass: "epi-iconPen",
+                            model: item,
+                            canExecute: true,
+                            isAvailable: true,
+                            //canExecute: true,
+                            //isAvailable: this._commandIsAvailable(commandMask.edit, availableCommands),
+                            delegate: lang.hitch(this, this.editItemDelegate)
+                        }),
+
+
+                        new DelegateCommand({
+                            name: "moveUp",
+                            category: category,
+                            label: sharedResources.action.moveup,
+                            iconClass: "epi-iconUp",
+                            model: item,
+                            canExecute: true,
+                            isAvailable: true,
+                            //canExecute: this._itemModels.indexOf(item) > 0,
+                            //isAvailable: this._commandIsAvailable(commandMask.moveUp, availableCommands),
+                            delegate: lang.hitch(this, this.moveItemUpDelegate)
+                        }),
+
+                        new DelegateCommand({
+                            name: "moveDown",
+                            category: category,
+                            label: sharedResources.action.movedown,
+                            iconClass: "epi-iconDown",
+                            model: item,
+                            canExecute: true,
+                            isAvailable: true,
+                            //canExecute: this._itemModels.indexOf(item) < this._itemModels.length - 1,
+                            //isAvailable: this._commandIsAvailable(commandMask.moveDown, availableCommands),
+                            delegate: lang.hitch(this, this.moveItemDownDelegate)
+                        }),
+
+                        new DelegateCommand({
+                            name: "remove",
+                            category: category,
+                            label: sharedResources.action.remove,
+                            iconClass: "epi-iconTrash",
+                            model: item,
+                            canExecute: true,
+                            isAvailable: true,
+                            //isAvailable: this._commandIsAvailable(commandMask.remove, availableCommands),
+                            delegate: lang.hitch(this, this.removeItemDelegate)
+                        })
+                    ];
+                },
+
+                _onGridRowSelect: function (e) {
+                    // summary:
+                    //      Makes sure the right commands are available in the context menu when selecting a row in the grid.
+                    // tags:
+                    //      private
+
+                    if (!this.grid.itemCommandProviderMap) {
+                        return;
+                    }
+                    if (this._currentProviderHandler) {
+                        this._currentProviderHandler.removeProvider();
+                    }
+                    var item = this.grid.row(e).data;
+                    this._currentProviderHandler = this.grid.contextMenu.addProvider(this.grid.itemCommandProviderMap[json.stringify(item)]);
+                },
+
+                onGridRowClick: function (e) {
+                    // summary:
+                    //      Makes sure the right commands are available in the context menu when selecting a row in the grid.
+                    // tags:
+                    //      protected
+                    this._onGridRowSelect(e);
+                },
+
+                onGridRowDblClick: function (e) {
+                    // summary:
+                    //      Makes sure the right commands are available in the context menu when selecting a row in the grid.
+                    // tags:
+                    //      protected
+                    if (this.readOnly) {
+                        return;
+                    }
+
+                    var item = {
+                        model: this.grid.row(e).data
+                    };
+                    this.editItemDelegate(item);
                 }
+
             });
     });
