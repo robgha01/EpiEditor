@@ -456,6 +456,8 @@ define([
 
                 widgetsInTemplate: true,
 
+                multiple: true,
+
                 resource: res,
 
                 templateString: template,
@@ -553,8 +555,6 @@ define([
                     this.connect(this.editorItem,
                         "onChange",
                         function(value) {
-                            //this._setValueAndFireOnChange(value);
-
                             this.store.put(value);
                             var tmpValue = [];
 
@@ -589,73 +589,9 @@ define([
                     // tags:
                     //    private
 
-                    this._set('value', value);
+                    this._set("value", value);
+                    this.store.setData(value);
+                    this.content.refresh();
                 }
-
-                //_setValueAttr: function(/*Object*/val) {
-                //    // summary:
-                //    //      The set value method
-                //    // tags:
-                //    //      public override
-
-                //    // Reset value to an empty array
-                //    if (!val || !(val instanceof Array)) {
-                //        //this._set("value", []);
-                //        //this._setValueAndFireOnChange([]);
-                //    } else {
-                //        this._setValueAndFireOnChange(val);
-                //    }
-                //},
-
-                // Event that tells EPiServer when the widget's value has changed.
-                //onChange: function (value) { },
-
-                //_onChange: function (value) {
-                //    console.log("Notifying EPiServer with onChange: " + JSON.stringify(value));
-                //    this.onChange(value);
-                //    console.log("Done notitying EPiServer");
-                //},
-
-                //_setValueAndFireOnChange: function (/* Object */ value) {
-                //    //summary:
-                //    //    Sets the value internally and fires onChange if the value differs than the current value
-                //    //
-                //    // value: [Object]
-                //    //    A related links with media model as value
-                //    //    Value to be set.
-                //    //
-                //    // tags:
-                //    //  private
-
-                //    //var currentLink = this.get("value");
-                //    //this._set("value", value);
-
-                //    var currentLink = this.get("value");
-
-                //    this.store.put(value);
-                //    var tmpValue = [];
-
-                //    for (var item of this.store.data) {
-                //        tmpValue.push({ caption: item.caption, image: item.image, page: item.page, href: item.href });
-                //    }
-
-                //    this._set("value", tmpValue);
-
-                //    // detect whether to invoke onChange or not
-                //    var triggerOnChange = true;
-
-                //    if (!currentLink && !value) {
-                //        triggerOnChange = false;
-                //    } else if (value && value === currentLink) {
-                //        triggerOnChange = false;
-                //    }
-
-                //    if (triggerOnChange) {
-                //        this.onChange(value);
-                //    }
-                //},
-                //isValid: function () {
-                //    return true;
-                //}
             });
     });
