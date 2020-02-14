@@ -1,0 +1,11 @@
+﻿.rlm-content-area-editor {
+    background-color: #FAFAFA;
+    border: 2px solid #DEDEDE;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    height: auto;
+    line-height: 1.2;
+    min-height: 24px;
+    width: 360px;
+    padding: 8px;
+}
