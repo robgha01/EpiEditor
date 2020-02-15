@@ -204,29 +204,29 @@
                             renderCell: function(object, value, node, options) {
                                 node.textContent = object.caption;
                             }
-                        },
-                        image: {
-                            sortable: false,
-                            label: "Image",
-                            className: "epi-grid--40 epi-cursor--default",
-                            renderCell: function(object, value, node, options) {
-                                var title = object.name + ", ID: " + object.contentLink;
-                                node.innerHTML =
-                                    listItemFormatters.statusFormatter(
-                                        formatters.contentItem(object.typeIdentifier, "", value, title),
-                                        object,
-                                        node,
-                                        options);
-                            }
-                        },
-                        url: {
-                            sortable: false,
-                            className: "epi-grid--30 epi-cursor--default",
-                            label: "Url",
-                            renderCell: function(object, value, node, options) {
-                                node.textContent = object.page ? object.page.id : object.href;
-                            }
-                        }
+                        }//,
+                        //image: {
+                        //    sortable: false,
+                        //    label: "Image",
+                        //    className: "epi-grid--40 epi-cursor--default",
+                        //    renderCell: function(object, value, node, options) {
+                        //        var title = object.name + ", ID: " + object.contentLink;
+                        //        node.innerHTML =
+                        //            listItemFormatters.statusFormatter(
+                        //                formatters.contentItem(object.typeIdentifier, "", value, title),
+                        //                object,
+                        //                node,
+                        //                options);
+                        //    }
+                        //},
+                        //url: {
+                        //    sortable: false,
+                        //    className: "epi-grid--30 epi-cursor--default",
+                        //    label: "Url",
+                        //    renderCell: function(object, value, node, options) {
+                        //        node.textContent = object.page ? object.page.id : object.href;
+                        //    }
+                        //}
                     };
 
                     var commands = [
@@ -338,16 +338,6 @@
                     this.grid.resize();
                 },
 
-                //_displayActionsContainer: function() {
-                //    // summary:
-                //    //      Show/not actions container area
-                //    // tags:
-                //    //      private
-
-                //    // Hide actions when readonly or set not visible
-                //    domStyle.set(this.actionsContainer, "display", this.readOnly || !this.actionsVisible ? "none" : "");
-                //},
-
                 _setValueAttr: function (value) {
                     // summary:
                     //    Sets the value of the widget to "value" and updates the value displayed in the textbox.
@@ -369,6 +359,8 @@
                     //      protected
 
                     //this.emit("toggleItemEditor", null);
+
+                    this._onCreateNewItemClick();
                 },
 
                 editItemDelegate: function (cmd) {
@@ -384,6 +376,8 @@
 
                     //    this.emit("toggleItemEditor", item, index);
                     //}
+
+                    
                 },
 
                 removeItemDelegate: function (cmd) {
