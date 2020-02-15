@@ -98,6 +98,7 @@ define([
     "dojo/when",
     "dojo/aspect",
     "dojo/Deferred",
+    "dojox/uuid/generateRandomUuid",
 
     // EPi Framework
     "epi/shell/widget/_ModelBindingMixin",
@@ -119,6 +120,7 @@ define([
         when,
         aspect,
         Deferred,
+        generateRandomUuid,
 
         // EPi Framework
         _ModelBindingMixin,
@@ -212,7 +214,7 @@ define([
 
                 this.dialogContent = new LinkEditor({
                     modelType: this.modelType,
-                    hiddenFields: ["text", "title", "target", "language"]
+                    hiddenFields: ["id", "text", "title", "target", "language"]
                 });
 
                 this.own(this.dialogContent);
@@ -261,6 +263,21 @@ define([
                 //  private
 
                 var currentLink = this.get("value");
+                if (currentLink && value) {
+                    // generate and set a uuid if needed
+                    if (currentLink.id == null || currentLink.id === "") {
+                        // set the id to a unique guid
+                        currentLink.id = generateRandomUuid();
+                    }
+                    value.id = currentLink.id;
+                } else if (value) {
+                    // generate and set a uuid if needed
+                    if (value.id == null || value.id === "") {
+                        // set the id to a unique guid
+                        value.id = generateRandomUuid();
+                    }
+                }
+
                 this._set("value", value);
 
                 // detect whether to invoke onChange or not

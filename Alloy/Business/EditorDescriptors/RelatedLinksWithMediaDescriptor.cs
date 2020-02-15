@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using EPiServer.Cms.Shell.UI.ObjectEditing.InternalMetadata;
 using EPiServer.Core;
@@ -14,6 +15,8 @@ namespace Alloy.Business.EditorDescriptors
 {
     public class RelatedLinksWithMedia : ICloneable, IEquatable<RelatedLinksWithMedia>
     {
+        public string Id { get; set; }
+
         public string Caption { get; set; }
 
         public ContentReference Image { get; set; }

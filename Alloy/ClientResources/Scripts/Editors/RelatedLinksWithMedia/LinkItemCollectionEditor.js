@@ -304,63 +304,52 @@
                     //this.setupActionContainer();
                 },
 
-                _onCreateNewItemClick: function() {
-                    this.own(this.editorItem = new declare([EditorItem])({
-                        startpageContentLink: this.startpageContentLink,
-                        allowedTypes: this.allowedTypes,
-                        msRepositoryKey: this.msRepositoryKey,
-                        msAllowedTypes: this.msAllowedTypes,
-                        urlModelType: this.urlModelType,
-                        modelType: this.modelType,
-                        providers: this.providers
+                _onCreateNewItemClick: function () {
+                    var self = this;
+
+                    this.own(self.editorItem = new declare([EditorItem])({
+                        startpageContentLink: self.startpageContentLink,
+                        allowedTypes: self.allowedTypes,
+                        msRepositoryKey: self.msRepositoryKey,
+                        msAllowedTypes: self.msAllowedTypes,
+                        urlModelType: self.urlModelType,
+                        modelType: self.modelType,
+                        providers: self.providers
                     }));
 
                     // Show the dialog
-                    this.editorItem._onButtonClick();
-                    this.connect(this.editorItem,
+                    self.editorItem._onButtonClick();
+                    self.connect(self.editorItem,
                         "onChange",
                         function(value) {
-                            this.store.put(value);
-                            var tmpValue = [];
-
-                            for (var item of this.store.data) {
-                                tmpValue.push({ caption: item.caption, image: item.image, page: item.page, href: item.href });
-                            }
-
-                            this.onFocus();
-                            this.set("value", tmpValue);
-                            this.onChange(tmpValue);
+                            self.onFocus();
+                            self.store.put(value);
+                            self.set("value", this.store.data);
                         });
                 },
 
                 _onEditItemClick: function (item) {
-                    this.own(this.editorItem = new declare([EditorItem])({
-                        startpageContentLink: this.startpageContentLink,
-                        allowedTypes: this.allowedTypes,
-                        msRepositoryKey: this.msRepositoryKey,
-                        msAllowedTypes: this.msAllowedTypes,
-                        urlModelType: this.urlModelType,
-                        modelType: this.modelType,
-                        providers: this.providers
+                    var self = this;
+                    self.own(self.editorItem = new declare([EditorItem])({
+                        startpageContentLink: self.startpageContentLink,
+                        allowedTypes: self.allowedTypes,
+                        msRepositoryKey: self.msRepositoryKey,
+                        msAllowedTypes: self.msAllowedTypes,
+                        urlModelType: self.urlModelType,
+                        modelType: self.modelType,
+                        providers: self.providers
                     }));
 
-                    this.editorItem._setValueAttr(item);
+                    self.editorItem._setValueAttr(item);
 
                     // Show the dialog
-                    this.editorItem._onButtonClick();
-                    this.connect(this.editorItem,
+                    self.editorItem._onButtonClick();
+                    self.connect(self.editorItem,
                         "onChange",
                         function (value) {
-                            this.store.put(value);
-                            var tmpValue = [];
-
-                            for (var item of this.store.data) {
-                                tmpValue.push({ caption: item.caption, image: item.image, page: item.page, href: item.href });
-                            }
-
-                            this.onFocus();
-                            this.set("value", tmpValue);
-                            this.onChange(tmpValue);
+                            self.onFocus();
+                            self.store.put(value);
+                            self.set("value", self.store.data);
                         });
                 },
 
@@ -375,9 +364,13 @@
                     // tags:
                     //    private
 
+                    this.onFocus();
                     this._set("value", value);
                     this.store.setData(value);
                     this.grid.refresh();
+
+                    // tell epi to save the value
+                    this.onChange(this.store.data);
                 },
 
                 //----------------------------------------------------------------------------------
@@ -418,6 +411,11 @@
                     //      protected
 
                     //this.removeItem(cmd.model);
+
+                    //this.store.remove("df25b1b0-dbac-40e6-8ad5-fadc956bde48");
+                    //this.onFocus();
+                    //this.set("value", []);
+                    //this.onChange([]);
                 },
 
                 moveItemUpDelegate: function (cmd) {
