@@ -333,6 +333,37 @@
                         });
                 },
 
+                _onEditItemClick: function (item) {
+                    this.own(this.editorItem = new declare([EditorItem])({
+                        startpageContentLink: this.startpageContentLink,
+                        allowedTypes: this.allowedTypes,
+                        msRepositoryKey: this.msRepositoryKey,
+                        msAllowedTypes: this.msAllowedTypes,
+                        urlModelType: this.urlModelType,
+                        modelType: this.modelType,
+                        providers: this.providers
+                    }));
+
+                    this.editorItem._setValueAttr(item);
+
+                    // Show the dialog
+                    this.editorItem._onButtonClick();
+                    this.connect(this.editorItem,
+                        "onChange",
+                        function (value) {
+                            this.store.put(value);
+                            var tmpValue = [];
+
+                            for (var item of this.store.data) {
+                                tmpValue.push({ caption: item.caption, image: item.image, page: item.page, href: item.href });
+                            }
+
+                            this.onFocus();
+                            this.set("value", tmpValue);
+                            this.onChange(tmpValue);
+                        });
+                },
+
                 _size: function() {
                     this.inherited(arguments);
                     this.grid.resize();
@@ -377,7 +408,7 @@
                     //    this.emit("toggleItemEditor", item, index);
                     //}
 
-                    
+                    this._onEditItemClick(cmd.model);
                 },
 
                 removeItemDelegate: function (cmd) {
