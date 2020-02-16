@@ -516,6 +516,8 @@
     <Content Include="Views\ImageFile\Index.cshtml" />
     <Content Include="Views\ContactBlock\Index.cshtml" />
     <Content Include="Views\ArticlePage\Index.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\RelatedLinksWithMediaCollection.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\RelatedLinksWithMedia.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

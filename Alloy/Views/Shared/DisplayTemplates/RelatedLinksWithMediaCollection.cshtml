@@ -1,0 +1,10 @@
+@model IEnumerable<Alloy.Business.EditorDescriptors.RelatedLinksWithMedia>
+@if(Model != null && Model.Any())
+{
+    <ul>
+        @foreach(var stringValue in Model)
+        {
+            <li>@stringValue.Caption</li>
+        }
+    </ul>
+}
