@@ -206,16 +206,20 @@ define([
                 this.set("value", linkObj);
             },
 
+            _getDialogContent() {
+                return new LinkEditor({
+                    modelType: this.modelType,
+                    hiddenFields: ["id", "text", "title", "target", "language"]
+                });
+            },
+
             _getDialog: function () {
                 // summary:
                 //		Create Link Editor dialog
                 // tags:
                 //    protected
 
-                this.dialogContent = new LinkEditor({
-                    modelType: this.modelType,
-                    hiddenFields: ["id", "text", "title", "target", "language"]
-                });
+                this.dialogContent = this._getDialogContent();
 
                 this.own(this.dialogContent);
 

@@ -129,26 +129,11 @@
         sharedResources,
         EditorItem
     ) {
-
-        var commandMask = {
-            // summary:
-            //      Command mask enum.
-            // tags:
-            //      internal
-            none: 0, add: 1, edit: 2, remove: 4, moveUp: 8, moveDown: 16
-        };
-
         return declare("alloy.editors.RelatedLinksWithMedia.LinkItemCollectionEditor",
             [
                 _Widget, _TemplatedMixin, _WidgetsInTemplateMixin, _CssStateMixin
             ],
             {
-                // summary:
-                //    Represents the widget to edit todo.
-                // tags:
-                //    internal
-                newItemDialog: null,
-
                 value: null,
 
                 widgetsInTemplate: true,
@@ -173,15 +158,6 @@
 
                     //!this.value && this.set("value", null);
                     //this._size();
-                },
-
-                postMixInProperties: function() {
-                    this.inherited(arguments);
-
-                    if (!this.model && this.modelClassName) {
-                        var modelClass = declare(this.modelClassName);
-                        this.model = new modelClass();
-                    }
                 },
 
                 postCreate: function() {
@@ -238,7 +214,7 @@
                             iconClass: "epi-iconPlus",
                             canExecute: true,
                             isAvailable: true, //this._commandIsAvailable(commandMask.add, availableCommands),
-                            delegate: lang.hitch(this, this.addItemDelegate)
+                            delegate: lang.hitch(this, this.addItem)
                         })
                     ];
 
@@ -263,55 +239,6 @@
                     this.own(this.grid.on(".dgrid-row:dblclick", lang.hitch(this, this.onGridRowDblClick)));
                 },
 
-                _onCreateNewItemClick: function () {
-                    var self = this;
-
-                    this.own(self.editorItem = new declare([EditorItem])({
-                        startpageContentLink: self.startpageContentLink,
-                        allowedTypes: self.allowedTypes,
-                        msRepositoryKey: self.msRepositoryKey,
-                        msAllowedTypes: self.msAllowedTypes,
-                        urlModelType: self.urlModelType,
-                        modelType: self.modelType,
-                        providers: self.providers
-                    }));
-
-                    // Show the dialog
-                    self.editorItem._onButtonClick();
-                    self.connect(self.editorItem,
-                        "onChange",
-                        function(value) {
-                            self.onFocus();
-                            self.store.put(value);
-                            self.set("value", [...self.store.data]);
-                        });
-                },
-
-                _onEditItemClick: function (item) {
-                    var self = this;
-                    self.own(self.editorItem = new declare([EditorItem])({
-                        startpageContentLink: self.startpageContentLink,
-                        allowedTypes: self.allowedTypes,
-                        msRepositoryKey: self.msRepositoryKey,
-                        msAllowedTypes: self.msAllowedTypes,
-                        urlModelType: self.urlModelType,
-                        modelType: self.modelType,
-                        providers: self.providers
-                    }));
-
-                    self.editorItem._setValueAttr(item);
-
-                    // Show the dialog
-                    self.editorItem._onButtonClick();
-                    self.connect(self.editorItem,
-                        "onChange",
-                        function (value) {
-                            self.onFocus();
-                            self.store.put(value);
-                            self.set("value", [...self.store.data]);
-                        });
-                },
-
                 _size: function() {
                     this.inherited(arguments);
                     this.grid.resize();
@@ -332,50 +259,63 @@
                     this.onChange([...this.store.data]);
                 },
 
-                //----------------------------------------------------------------------------------
-                // Command delagate methods
-                //----------------------------------------------------------------------------------
-                addItemDelegate: function () {
-                    // summary:
-                    //      execute delegate for add command.
-                    // tags:
-                    //      protected
+                openEditorDialog: function(callback, editorItemValue) {
+                    this.own(this.editorItem = new declare([EditorItem])({
+                        startpageContentLink: this.startpageContentLink,
+                        allowedTypes: this.allowedTypes,
+                        msRepositoryKey: this.msRepositoryKey,
+                        msAllowedTypes: this.msAllowedTypes,
+                        urlModelType: this.urlModelType,
+                        modelType: this.modelType,
+                        providers: this.providers
+                    }));
 
-                    //this.emit("toggleItemEditor", null);
+                    if (editorItemValue) {
+                        this.editorItem._setValueAttr(editorItemValue);
+                    }
 
-                    this._onCreateNewItemClick();
+                    // Hide the delete button
+                    declare.safeMixin(this.editorItem, {
+                        _getDialogContent: function () {
+                            var linkEditor = this.inherited(arguments);
+
+                            // override the linkeditor getActions
+                            declare.safeMixin(linkEditor, {
+                                getActions: function () {
+                                    var actions = this.inherited(arguments);
+
+                                    actions.splice(1, 1);
+
+                                    return actions;
+                                }
+                            });
+
+                            return linkEditor;
+                        }
+                    });
+
+                    // Show the dialog
+                    this.editorItem._onButtonClick();
+
+                    // Connect the onChange event to our callback
+                    this.connect(this.editorItem, "onChange", callback);
                 },
 
-                editItemDelegate: function (cmd) {
-                    // summary:
-                    //      execute delegate for edit command.
-                    // tags:
-                    //      protected
-
-                    //if (this._commandIsAvailable(commandMask.edit, this.availableCommands)) {
-
-                    //    var item = cmd.model;
-                    //    var index = this._itemModels.indexOf(item);
-
-                    //    this.emit("toggleItemEditor", item, index);
-                    //}
-
-                    this._onEditItemClick(cmd.model);
+                addItem: function () {
+                    this.openEditorDialog(function (value) {
+                        this.store.put(value);
+                        this.set("value", this.store.data);
+                    });
                 },
 
-                removeItemDelegate: function (cmd) {
-                    // summary:
-                    //      execute delegate for remove command.
-                    // tags:
-                    //      protected
+                editItem: function (cmd) {
+                    this.openEditorDialog(function (value) {
+                        this.store.put(value);
+                        this.set("value", this.store.data);
+                    }, cmd.model);
+                },
 
-                    //this.removeItem(cmd.model);
-
-                    //this.store.remove("df25b1b0-dbac-40e6-8ad5-fadc956bde48");
-                    //this.onFocus();
-                    //this.set("value", []);
-                    //this.onChange([]);
-
+                removeItem: function (cmd) {
                     var self = this;
                     dialogService.confirmation({
                         heading: "Remove " + cmd.model.caption,
@@ -383,10 +323,35 @@
                         iconClass: "epi-iconTrash"
                     }).then(function () {
                         self.store.remove(cmd.model.id);
-                        self.set("value", [...self.store.data]);
+                        self.set("value", self.store.data);
                     }).otherwise(function () {
-                        // Even tho we dont use this epi will throw error if its not here...
+                        // Even tho we don't use this epi will throw error if its not here...
                     });
+                },
+
+                moveItem: function (item, before) {
+                    // Make a copy of the value store
+                    var valueArray = [...this.store.data];
+
+                    // Indicate that is still moving
+                    this._itemsUnchanged = true;
+
+                    var itemIndex = valueArray.indexOf(item);
+
+                    // Remove item
+                    valueArray.splice(itemIndex, 1);
+
+                    // Get ref index
+                    var refIndex = itemIndex.valueOf();
+                    var targetIndex = before ? refIndex - 1 : refIndex + 1;
+                    //are we moving the same item? use itemIndex since refIndex will be -1;
+                    targetIndex = refIndex === -1 ? itemIndex : targetIndex;
+
+                    valueArray.splice(targetIndex, 0, item);
+
+                    // Sync the value store
+                    this.store.setData(valueArray);
+                    this.set("value", this.store.data);
                 },
 
                 moveItemUpDelegate: function (cmd) {
@@ -395,28 +360,22 @@
                     // tags:
                     //      protected
 
-                    //var item = cmd.model;
-                    //var index = this._itemModels.indexOf(item);
-                    //var refIndex = index - 1;
-
-                    //if (refIndex >= 0) {
-                    //    this.moveItem(item, this._itemModels[refIndex], true);
-                    //}
+                    var item = cmd.model;
+                    var index = this.store.data.indexOf(item);
+                    var refIndex = index - 1;
+                    if (refIndex >= 0) {
+                        this.moveItem(item, true);
+                    }
                 },
 
                 moveItemDownDelegate: function (cmd) {
-                    // summary:
-                    //      execute delegate for move down command.
-                    // tags:
-                    //      protected
+                    var item = cmd.model;
+                    var index = this.store.data.indexOf(item);
+                    var refIndex = index + 1;
 
-                    //var item = cmd.model;
-                    //var index = this._itemModels.indexOf(item);
-                    //var refIndex = index + 1;
-
-                    //if (refIndex < this._itemModels.length) {
-                    //    this.moveItem(item, this._itemModels[refIndex], false);
-                    //}
+                    if (refIndex < this.store.data.length) {
+                        this.moveItem(item, false);
+                    }
                 },
 
                 getItemCommands: function (item, availableCommands, category) {
@@ -442,7 +401,7 @@
                             isAvailable: true,
                             //canExecute: true,
                             //isAvailable: this._commandIsAvailable(commandMask.edit, availableCommands),
-                            delegate: lang.hitch(this, this.editItemDelegate)
+                            delegate: lang.hitch(this, this.editItem)
                         }),
 
 
@@ -452,9 +411,8 @@
                             label: sharedResources.action.moveup,
                             iconClass: "epi-iconUp",
                             model: item,
-                            canExecute: true,
                             isAvailable: true,
-                            //canExecute: this._itemModels.indexOf(item) > 0,
+                            canExecute: this.store.data.indexOf(item) > 0,
                             //isAvailable: this._commandIsAvailable(commandMask.moveUp, availableCommands),
                             delegate: lang.hitch(this, this.moveItemUpDelegate)
                         }),
@@ -465,9 +423,8 @@
                             label: sharedResources.action.movedown,
                             iconClass: "epi-iconDown",
                             model: item,
-                            canExecute: true,
                             isAvailable: true,
-                            //canExecute: this._itemModels.indexOf(item) < this._itemModels.length - 1,
+                            canExecute: this.store.data.indexOf(item) < this.store.data.length - 1,
                             //isAvailable: this._commandIsAvailable(commandMask.moveDown, availableCommands),
                             delegate: lang.hitch(this, this.moveItemDownDelegate)
                         }),
@@ -481,7 +438,7 @@
                             canExecute: true,
                             isAvailable: true,
                             //isAvailable: this._commandIsAvailable(commandMask.remove, availableCommands),
-                            delegate: lang.hitch(this, this.removeItemDelegate)
+                            delegate: lang.hitch(this, this.removeItem)
                         })
                     ];
                 },
@@ -522,7 +479,7 @@
                     var item = {
                         model: this.grid.row(e).data
                     };
-                    this.editItemDelegate(item);
+                    this.editItem(item);
                 }
 
             });
