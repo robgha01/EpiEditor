@@ -46,6 +46,7 @@
     "epi-cms/dgrid/WithContextMenu",
     "epi/shell/dnd/Target",
     "epi/shell/widget/ContextMenu",
+    "epi/shell/DialogService",
 
     // EPi CMS
     "epi-cms/contentediting/command/NewItem",
@@ -112,6 +113,7 @@
         WithContextMenu,
         Target,
         ContextMenu,
+        dialogService,
 
         // EPi CMS
         NewItemCommand,
@@ -259,49 +261,6 @@
 
                     this.own(this.grid.on(".dgrid-row:click", lang.hitch(this, this.onGridRowClick)));
                     this.own(this.grid.on(".dgrid-row:dblclick", lang.hitch(this, this.onGridRowDblClick)));
-
-                    //var gridSettings = {
-                    //    store: this.store,
-                    //    showHeader: false,
-                    //    "class": "epi-plain-grid epi-grid-height--auto",
-                    //    columns: {
-                    //        caption: {
-                    //            sortable: false,
-                    //            label: "Caption",
-                    //            className: "epi-grid--30 epi-cursor--default",
-                    //            renderCell: function(object, value, node, options) {
-                    //                node.textContent = object.caption;
-                    //            }
-                    //        },
-                    //        image: {
-                    //            sortable: false,
-                    //            label: "Image",
-                    //            className: "epi-grid--40 epi-cursor--default",
-                    //            renderCell: function(object, value, node, options) {
-                    //                var title = object.name + ", ID: " + object.contentLink;
-                    //                node.innerHTML =
-                    //                    listItemFormatters.statusFormatter(
-                    //                        formatters.contentItem(object.typeIdentifier, "", value, title),
-                    //                        object,
-                    //                        node,
-                    //                        options);
-                    //            }
-                    //        },
-                    //        url: {
-                    //            sortable: false,
-                    //            className: "epi-grid--30 epi-cursor--default",
-                    //            label: "Url",
-                    //            renderCell: function(object, value, node, options) {
-                    //                node.textContent = object.page ? object.page.id : object.href;
-                    //            }
-                    //        }
-                    //    }
-                    //};
-                    //this.own(this.grid = new declare([OnDemandGrid])(gridSettings, this.itemsContainer));
-                    //this.grid.startup();
-
-                    //this.setupCommands();
-                    //this.setupActionContainer();
                 },
 
                 _onCreateNewItemClick: function () {
@@ -324,7 +283,7 @@
                         function(value) {
                             self.onFocus();
                             self.store.put(value);
-                            self.set("value", this.store.data);
+                            self.set("value", [...self.store.data]);
                         });
                 },
 
@@ -349,7 +308,7 @@
                         function (value) {
                             self.onFocus();
                             self.store.put(value);
-                            self.set("value", self.store.data);
+                            self.set("value", [...self.store.data]);
                         });
                 },
 
@@ -365,12 +324,12 @@
                     //    private
 
                     this.onFocus();
-                    this._set("value", value);
-                    this.store.setData(value);
+                    this._set("value", [...value]);
+                    this.store.setData([...value]);
                     this.grid.refresh();
 
                     // tell epi to save the value
-                    this.onChange(this.store.data);
+                    this.onChange([...this.store.data]);
                 },
 
                 //----------------------------------------------------------------------------------
@@ -416,6 +375,18 @@
                     //this.onFocus();
                     //this.set("value", []);
                     //this.onChange([]);
+
+                    var self = this;
+                    dialogService.confirmation({
+                        heading: "Remove " + cmd.model.caption,
+                        content: "Are you sure you want to remove "+"'" + cmd.model.caption + "'?",
+                        iconClass: "epi-iconTrash"
+                    }).then(function () {
+                        self.store.remove(cmd.model.id);
+                        self.set("value", [...self.store.data]);
+                    }).otherwise(function () {
+                        // Even tho we dont use this epi will throw error if its not here...
+                    });
                 },
 
                 moveItemUpDelegate: function (cmd) {
