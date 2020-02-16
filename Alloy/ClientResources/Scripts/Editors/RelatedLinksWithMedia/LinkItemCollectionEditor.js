@@ -244,13 +244,22 @@
                     this.grid.resize();
                 },
 
+                // Event that tells EPiServer when the widget's value has changed.
+                onChange: function (value) { }, // This is needed else on page editing wont work.
+
+                _onChange: function (value) { // This is needed else on page editing wont work.
+                    console.log("Notifying EPiServer with onChange: " + JSON.stringify(value));
+                    this.onChange(value);
+                    console.log("Done notitying EPiServer");
+                },
+
                 _setValueAttr: function (value) {
                     // summary:
                     //    Sets the value of the widget to "value" and updates the value displayed in the textbox.
                     // tags:
                     //    private
 
-                    this.onFocus();
+                    this.onFocus(); // This is needed else EpiServer wont save the value
                     this._set("value", [...value]);
                     this.store.setData([...value]);
                     this.grid.refresh();
