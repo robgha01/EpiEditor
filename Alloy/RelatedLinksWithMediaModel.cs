@@ -49,9 +49,9 @@ namespace Alloy
         //[DisplayName("/episerver/cms/widget/editlink/linktitle")]
         //public string Title { get; set; }
 
-        //[UIHint("TargetFrame")]
-        //[DisplayName("/contenttypes/icontentdata/properties/pagetargetframe/caption")]
-        //public int? Target { get; set; }
+        [UIHint("TargetFrame")]
+        [DisplayName("/contenttypes/icontentdata/properties/pagetargetframe/caption")]
+        public int? Target { get; set; }
 
         [UIHint(UIHint.Image)]
         public ContentReference Image { get; set; }

@@ -1,10 +1,19 @@
 @model IEnumerable<Alloy.Business.EditorDescriptors.RelatedLinksWithMedia>
-@if(Model != null && Model.Any())
+@if (Model != null && Model.Any())
 {
-    <ul>
-        @foreach(var stringValue in Model)
-        {
-            <li>@stringValue.Caption</li>
-        }
-    </ul>
+    foreach (var item in Model)
+    {
+        <figure>
+            <img src="@Url.ContentUrl(item.Image)">
+            <figcaption class="dijitInline dojoxEllipsis">
+                <span>@item.Caption</span>
+                @*<span>
+                    @if (item.Page != null || !string.IsNullOrEmpty(item.Href))
+                    {
+                        <a href="@(item.Page != null ? Url.ContentUrl(item.Page) : item.Href)" class="btn btn-primary">Open</a>
+                    }
+                </span>*@
+            </figcaption>
+        </figure>
+    }
 }

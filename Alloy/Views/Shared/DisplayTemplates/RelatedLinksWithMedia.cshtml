@@ -1,4 +1,13 @@
 @model Alloy.Business.EditorDescriptors.RelatedLinksWithMedia
-<div>
-    <p>@Model.Caption</p>
-</div>
+<figure>
+    <img src="@Url.ContentUrl(Model.Image)">
+    <figcaption class="dijitInline dojoxEllipsis">
+        <span>@Model.Caption</span>
+        @*<span>
+            @if (Model.Page != null || !string.IsNullOrEmpty(Model.Href))
+            {
+                <a href="@(Model.Page != null ? Url.ContentUrl(Model.Page) : Model.Href)" class="btn btn-primary">Open</a>
+            }
+        </span>*@
+    </figcaption>
+</figure>

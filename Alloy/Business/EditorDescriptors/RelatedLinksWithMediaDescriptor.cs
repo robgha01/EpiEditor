@@ -25,6 +25,8 @@ namespace Alloy.Business.EditorDescriptors
 
         public string Href { get; set; }
 
+        public int? Target { get; set; }
+
         public object Clone()
         {
             RelatedLinksWithMedia linkItem = new RelatedLinksWithMedia();

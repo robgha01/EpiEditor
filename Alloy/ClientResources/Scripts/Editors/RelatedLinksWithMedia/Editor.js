@@ -1,95 +1,4 @@
-﻿//define(
-//    [
-//        "epi/i18n!epi/cms/nls/episerver.cms.widget.editlink",
-//        "dojo/on",
-//        "dojo/_base/declare",
-//        "dojo/_base/lang",
-//        "dijit/_Widget",
-//        "dijit/_TemplatedMixin",
-//        "epi/shell/widget/dialog/Dialog",
-//        "epi-cms/widget/_HasChildDialogMixin",
-//        "alloy/editors/RelatedLinksWithMedia/ItemDialog",
-//        "epi/epi",
-//        "epi-cms/core/ContentReference",
-//        "dojo/text!./templates/editorTemplate.html",
-//        "xstyle/css!./editor.css"
-//    ],
-//    function (
-//        res,
-//        on,
-//        declare,
-//        lang,
-//        _Widget,
-//        _TemplatedMixin,
-//        Dialog,
-//        _HasChildDialogMixin,
-//        ItemDialog,
-//        epi,
-//        ContentReference,
-//        template
-//    ) {
-//        return declare("alloy.editors.RelatedLinksWithMedia.Editor", [_Widget, _TemplatedMixin],
-//            {
-//                resource: res,
-//                // templateString: [protected] String
-//                // A string that represents the default widget template.
-//                templateString: template,
-//                _setValueAttr: function (value) {
-//                    // summary : Sets the value of the widget to "value" and updates the value displayed in the textbox.
-//                    // tags    : private
-
-//                    this._set('value', value);
-//                    if (this.model) {
-//                        this.model.value = this.value || '';
-//                    }
-//                },
-//                _getDialog: function () {
-//                    // summary:
-//                    //		Create Link Editor dialog
-//                    // tags:
-//                    //    protected
-
-//                    this.dialogContent = new ItemDialog({
-//                        startpageContentLink: this.startpageContentLink,
-//                        allowedTypes: this.allowedTypes,
-//                        msRepositoryKey: this.msRepositoryKey,
-//                        msAllowedTypes: this.msAllowedTypes,
-//                        providers: this.providers,
-//                        modelType: this.modelType
-//                    });
-
-//                    this.own(this.dialogContent);
-
-//                    return new Dialog({
-//                        title: this._getTitle(),
-//                        dialogClass: "epi-dialog-portrait",
-//                        content: this.dialogContent,
-//                        destroyOnHide: false,
-//                        defaultActionsVisible: false
-//                    });
-//                },
-//                _getTitle: function () {
-//                    // summary:
-//                    //      Customize base get method for title prop.
-//                    // tags:
-//                    //      protected
-
-//                    return lang.replace(this.value ? this.resource.title.template.edit : this.resource.title.template.create, this.resource.title.action);
-//                },
-//                openAddNewItemDialog: function () {
-//                    var dialog = this._getDialog();
-
-//                    this.isShowingChildDialog = true;
-//                    dialog.show();
-//                },
-//                postCreate: function () {
-//                    this.inherited(arguments);
-//                }
-//            });
-//    }
-//);
-
-define([
+﻿define([
     // dojo
     "dojo/_base/declare",
     "dojo/_base/lang",
@@ -150,10 +59,10 @@ define([
             postMixInProperties: function () {
                 this.inherited(arguments);
 
-                if (!this.model && this.modelClassName) {
-                    var modelClass = declare(this.modelClassName);
-                    this.model = new modelClass();
-                }
+                //if (!this.model && this.modelClassName) {
+                //    var modelClass = declare(this.modelClassName);
+                //    this.model = new modelClass();
+                //}
             },
 
             startup: function () {
@@ -209,7 +118,7 @@ define([
             _getDialogContent() {
                 return new LinkEditor({
                     modelType: this.modelType,
-                    hiddenFields: ["id", "text", "title", "target", "language"]
+                    hiddenFields: ["id", "text", "title", "language"]
                 });
             },
 
